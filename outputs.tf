@@ -15,7 +15,7 @@ output "public_subnets" {
 }
 
 output "vpc_id" {
-  value = "${aws_vpc.mod.id}"
+  value = "${var.vpc_id}"
 }
 
 output "public_route_table_ids" {
@@ -27,7 +27,7 @@ output "private_route_table_ids" {
 }
 
 output "default_security_group_id" {
-  value = "${aws_vpc.mod.default_security_group_id}"
+  value = "${var.default_security_group_id}"
 }
 
 output "nat_eips" {

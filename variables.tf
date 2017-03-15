@@ -2,6 +2,10 @@ variable "name" {}
 
 variable "cidr" {}
 
+variable "vpc_id" {}
+
+variable "default_security_group_id" {}
+
 variable "public_subnets" {
   description = "A list of public subnets inside the VPC."
   default     = []

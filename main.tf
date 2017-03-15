@@ -1,17 +1,10 @@
-resource "aws_vpc" "mod" {
-  cidr_block           = "${var.cidr}"
-  enable_dns_hostnames = "${var.enable_dns_hostnames}"
-  enable_dns_support   = "${var.enable_dns_support}"
-  tags                 = "${merge(var.tags, map("Name", format("%s", var.name)))}"
-}
-
 resource "aws_internet_gateway" "mod" {
-  vpc_id = "${aws_vpc.mod.id}"
+  vpc_id = "${var.vpc_id}"
   tags   = "${merge(var.tags, map("Name", format("%s-igw", var.name)))}"
 }
 
 resource "aws_route_table" "public" {
-  vpc_id           = "${aws_vpc.mod.id}"
+  vpc_id           = "${var.vpc_id}"
   propagating_vgws = ["${var.public_propagating_vgws}"]
   tags             = "${merge(var.tags, map("Name", format("%s-rt-public", var.name)))}"
 }
@@ -30,14 +23,14 @@ resource "aws_route" "private_nat_gateway" {
 }
 
 resource "aws_route_table" "private" {
-  vpc_id           = "${aws_vpc.mod.id}"
+  vpc_id           = "${var.vpc_id}"
   propagating_vgws = ["${var.private_propagating_vgws}"]
   count            = "${length(var.private_subnets)}"
   tags             = "${merge(var.tags, map("Name", format("%s-rt-private-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_subnet" "private" {
-  vpc_id            = "${aws_vpc.mod.id}"
+  vpc_id            = "${var.vpc_id}"
   cidr_block        = "${var.private_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
   count             = "${length(var.private_subnets)}"
@@ -45,7 +38,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "database" {
-  vpc_id            = "${aws_vpc.mod.id}"
+  vpc_id            = "${var.vpc_id}"
   cidr_block        = "${var.database_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
   count             = "${length(var.database_subnets)}"
@@ -61,7 +54,7 @@ resource "aws_db_subnet_group" "database" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id            = "${aws_vpc.mod.id}"
+  vpc_id            = "${var.vpc_id}"
   cidr_block        = "${var.public_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
   count             = "${length(var.public_subnets)}"
